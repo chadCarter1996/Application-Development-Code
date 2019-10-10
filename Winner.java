@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Winner extends CardClassifier implements Cards {
 
 
-    //works perfectly EXCEPT with pairs!
+    //everything works fine now :)
     public static String[][] handWinner(String[][] allPlayerHands) {
 
         HashMap<String, String> imageLinks = GetCardPath.createMap(allCards, cardImageLocations);
@@ -20,12 +20,10 @@ public class Winner extends CardClassifier implements Cards {
         int totalBoardAndHoleCards = 7;
         int numPlayers = allPlayerHands.length;
         int handRank = 0;
-        //String[] bestHand = new String[totalBoardAndHoleCards];
         String[][] bestHands = new String[numPlayers][totalBoardAndHoleCards];
         String[][] handWinnerCardLocations = new String[numPlayers][5];
         int[][] playerHandInfo = new int[numPlayers][2];
         int bestHandRank = -1;
-        //int playerHandPosition = 0;
         String[] newBestHand = new String[numFinalCards];
         int[] bestCardHandScores = new int[numPlayers];
 
@@ -43,6 +41,7 @@ public class Winner extends CardClassifier implements Cards {
             boolean hasPair = HasHand.checkForHand(Pair.isPair(allPlayerHands[i]));
             boolean hasNothing = HasHand.checkForHand(HighCard.isHighCard(allPlayerHands[i]));
 
+            //checks for a player having a royal flush
             if (hasRoyalFlush){
                 handRank++;
                 playerHandInfo[i][0] = i;
@@ -50,6 +49,7 @@ public class Winner extends CardClassifier implements Cards {
                 playerHand = true;
             }
 
+            //checking for straight flush
             if (hasStraightFlush && !playerHand) {
                 handRank++;
                 playerHandInfo[i][0] = i;
@@ -57,6 +57,7 @@ public class Winner extends CardClassifier implements Cards {
                 playerHand = true;
             }
 
+            //etc.
             if (hasQuads && !playerHand) {
                 handRank++;
                 playerHandInfo[i][0] = i;
@@ -116,8 +117,6 @@ public class Winner extends CardClassifier implements Cards {
 
         }
 
-        //bestHandRank = playerHandInfo[0][1];
-
         for (int player = 0; player < numPlayers; player++) {
 
             if (playerHandInfo[player][1] > bestHandRank) {
@@ -133,7 +132,7 @@ public class Winner extends CardClassifier implements Cards {
         for (int player = 0; player < numPlayers; player++) {
 
             if (playerHandInfo[player][1] == bestHandRank) {
-                if (bestHandRank == 10) { //MAKE THIS IN A NEW CLASS!!!!!!!!
+                if (bestHandRank == 10) {
                     bestHands[player] = RoyalFlush.isRoyalFlush(allPlayerHands[player]);
                     cardRanks[player] = CardClassifier.scoreHand(bestHands[player], 0, -1, -1,-1,-1);
                     //playerHandPosition++;
@@ -187,8 +186,8 @@ public class Winner extends CardClassifier implements Cards {
             }
         }
 
-        newBestHand = bestHands[0]; //HOW do you fix this? //pair mess ups trace back to THIS statement!
-        bestCardHandScores = cardRanks[0]; //It REFUSES to return correct values. Why :(
+        newBestHand = bestHands[0]; 
+        bestCardHandScores = cardRanks[0]; //all issues fixed!
         for (int i = 1; i < numPlayers; i++) {
             for (int j = 0; j < 5; j++) {
                 if (bestCardHandScores[j] > cardRanks[i][j]) {
@@ -215,18 +214,17 @@ public class Winner extends CardClassifier implements Cards {
                         + "| |" + bestHands[player][4] + "|"); //Ask Brodie how you fix this mess.
 
                 bestPlayerCards[bestPlayerOrder - 1][0] = imageLinks.get(bestHands[player][0]);
-                //System.out.println(imageLinks.get(bestHands[player][0])); //1st card image link stored
+                
                 bestPlayerCards[bestPlayerOrder - 1][1] = imageLinks.get(bestHands[player][1]);
-                //System.out.println(imageLinks.get(bestHands[player][1])); //2nd card
+                
                 bestPlayerCards[bestPlayerOrder - 1][2] = imageLinks.get(bestHands[player][2]);
-                //System.out.println(imageLinks.get(bestHands[player][2])); //3rd card
+                
                 bestPlayerCards[bestPlayerOrder - 1][3] = imageLinks.get(bestHands[player][3]);
-                //System.out.println(imageLinks.get(bestHands[player][3])); //4th card
+                
                 bestPlayerCards[bestPlayerOrder - 1][4] = imageLinks.get(bestHands[player][4]);
-                //System.out.println(imageLinks.get(bestHands[player][4])); //5th card
+                
 
                 new DisplayWinnerCards(bestPlayerCards[player], "winner");
-                //displayBestHand(bestPlayerCards[bestPlayerOrder-1], "Player " + player);
                 //displays the winning hand for that player
             }
             else {
@@ -245,18 +243,16 @@ public class Winner extends CardClassifier implements Cards {
                 //System.out.println(imageLinks.get(bestHands[player][4])); //5th card
             }
         }
-        //System.out.println(Arrays.deepToString(bestPlayerCards));
+        
         return bestPlayerCards; //REMEMBER that the RETURNED VALUES are 1 more than the actual player positions!
     }
 
     static class DisplayWinnerCards implements ActionListener {
 
-        //private DrawCards cardsInHand;
+        
         private String[] winnerCardLocations;
         private String stage;
-        //private String[] preflopCards;
-        //private DrawCards cardsInHand;
-        //String[] boardAndHoleCards;
+       
 
         public DisplayWinnerCards(String[] winnerCardLocations, String stage) {
 
